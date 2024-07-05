@@ -1,0 +1,85 @@
+import streamlit as st
+import yfinance as yf
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+
+# Function to fetch historical stock data
+def fetch_data(ticker, period='2y'):
+    try:
+        data = yf.download(ticker, period=period)
+        if data.empty:
+            st.error(f"No data found for ticker: {ticker}")
+            return None
+        return data
+    except Exception as e:
+        st.error(f"Error fetching data for ticker: {ticker}, {e}")
+        return None
+
+# Function to preprocess data
+def preprocess_data(data):
+    if data is None or data.empty:
+        return None, None
+
+    data['Date'] = pd.to_datetime(data.index)
+    X = data[['Date']].apply(lambda x: x.values.astype(np.int64) // 10 ** 9)
+    y = data['Close']
+
+    return X, y
+
+# Function to train the model
+def train_model(X_train, y_train):
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    return model
+
+# Function to predict past and future prices
+def predict_prices(model, X):
+    predictions = model.predict(X)
+    return predictions
+
+# Streamlit app
+def main():
+    st.title('Stock Market Prediction')
+
+    ticker = st.text_input('Enter stock ticker', 'AAPL')
+    data = fetch_data(ticker)
+
+    if data is not None:
+        st.write(f'Data for {ticker}')
+        st.line_chart(data['Close'])
+
+        X, y = preprocess_data(data)
+
+        if X is not None and y is not None:
+            model = train_model(X, y)
+
+            # Predict past prices
+            past_predictions = predict_prices(model, X)
+            past_df = pd.DataFrame({'Date': data.index, 'Predicted Close': past_predictions})
+            st.write('Predicted Past Stock Prices')
+            st.write(past_df)
+
+            # Predict future prices for the next 12 months
+            future_dates = pd.date_range(start=data.index[-1], periods=12, freq='M')
+            future_X = future_dates.values.astype(np.int64) // 10 ** 9
+            future_predictions = predict_prices(model, future_X.reshape(-1, 1))
+            future_df = pd.DataFrame({'Date': future_dates, 'Predicted Close': future_predictions})
+            st.write('Predicted Future Stock Prices for the Next 12 Months')
+            st.write(future_df)
+
+            # Plot past and future predictions
+            fig, ax = plt.subplots()
+            ax.plot(data.index, data['Close'], label='Historical')
+            ax.plot(past_df['Date'], past_df['Predicted Close'], label='Predicted Past')
+            ax.plot(future_df['Date'], future_df['Predicted Close'], label='Predicted Future')
+            ax.legend()
+            st.pyplot(fig)
+        else:
+            st.error("Error in preprocessing data.")
+    else:
+        st.error("No data available for the given ticker.")
+
+if __name__ == "__main__":
+    main()
