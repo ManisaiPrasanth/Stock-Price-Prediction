@@ -1,7 +1,7 @@
 # Stock-Price-Prediction
 MAIN FEATURES:
 
-The main features of stock price prediction are it will collect the past one data and based on that it will predict the future one year data and it have confidence intervals and atlast it will suggests you to buy the stock or not.
+The main features of stock price prediction are it will collect the past one year data and based on that it will predict the future one year data by plotting the graphs and stock price too and it have three confidence intervals which is lowerbound upperbound and avg bound and atlast it will suggests you to buy the stock or not.
 
 Initially there are three mains teps to follow the stock price prediction.
 Step-1:
