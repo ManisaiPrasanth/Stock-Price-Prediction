@@ -1,4 +1,8 @@
 # Stock-Price-Prediction
+MAIN FEATURES:
+
+The main features of stock price prediction are it will collect the past one data and based on that it will predict the future one year data and it have confidence intervals and atlast it will suggests you to buy the stock or not.
+
 Initially there are three mains teps to follow the stock price prediction.
 Step-1:
 
@@ -15,3 +19,4 @@ These are the three line of code to to open a streamlit web application. First l
 Step-3:
 
 By opening the link paste the address and run it. we will get an perfect web application.
+
